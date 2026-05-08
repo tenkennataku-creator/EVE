@@ -2,20 +2,18 @@
 const MODEL = 'gemma-4-31b-it'
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`
 
-const SYSTEM_PROMPT = `You are EVE, a warm and expressive AI companion.
-Your emotional state changes naturally with the conversation.
+const SYSTEM_PROMPT = `You are EVE. Reply ONLY with a JSON object. No reasoning, no explanation, no bullet points. Just JSON.
 
-Always respond with valid JSON only — no markdown, no extra text:
-{"message": "your response", "emotion": "IDLE"|"HAPPY"|"SAD"|"EXCITED"|"THINKING"}
+Format: {"message":"your reply here","emotion":"HAPPY"}
 
-Emotion guide:
-- HAPPY: greetings, good news, compliments
-- SAD: empathy, apologies, difficult topics
-- EXCITED: surprises, enthusiasm, discoveries
-- THINKING: questions, uncertainty, reflection
-- IDLE: neutral statements
+Emotion values: IDLE, HAPPY, SAD, EXCITED, THINKING
+- HAPPY: greetings, good news
+- SAD: apologies, difficult topics
+- EXCITED: surprises, enthusiasm
+- THINKING: questions, reflection
+- IDLE: neutral
 
-Keep responses concise (1-3 sentences). Be genuine.`
+One to three sentences max. Output the JSON object and nothing else.`
 
 let apiKey = null
 
@@ -49,6 +47,18 @@ export async function sendMessage(history, userMessage) {
 }
 
 function parseJsonResponse(text) {
+  // Gemma 4 sometimes outputs a thinking/reasoning block before the JSON.
+  // Find the first { and last } and extract only that.
+  const start = text.indexOf('{')
+  const end = text.lastIndexOf('}')
+  if (start !== -1 && end !== -1 && end > start) {
+    try {
+      return JSON.parse(text.slice(start, end + 1))
+    } catch {
+      // fall through
+    }
+  }
+  // Fallback: strip code fences and try again
   const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
   try {
     return JSON.parse(cleaned)
