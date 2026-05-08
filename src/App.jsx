@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import SpineViewer from './components/SpineViewer'
 import ChatBox from './components/ChatBox'
 import ChatInput from './components/ChatInput'
-import { initGemini, sendMessage, isInitialized } from './lib/gemini'
+import { initGemini, sendMessage } from './lib/gemini'
 import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
 import { character } from './config/character'
 
@@ -17,11 +17,12 @@ const EMOTION_COLORS = {
 }
 
 export default function App() {
-  const [emotion, setEmotion]     = useState(EMOTIONS.IDLE)
-  const [messages, setMessages]   = useState([])
-  const [thinking, setThinking]   = useState(false)
-  const [ready, setReady]         = useState(false)
-  const [apiKey, setApiKey]       = useState('')
+  const [emotion, setEmotion]   = useState(EMOTIONS.IDLE)
+  const [messages, setMessages] = useState([])
+  const [thinking, setThinking] = useState(false)
+  const [ready, setReady]       = useState(false)
+  const [apiKey, setApiKey]     = useState('')
+  const historyRef              = useRef([])
 
   useEffect(() => {
     if (ENV_KEY) {
@@ -33,18 +34,24 @@ export default function App() {
 
   async function greet() {
     try {
-      const res = await sendMessage('Hello! Introduce yourself in one sentence.')
-      applyResponse(res)
+      const res = await sendMessage([], 'Hello! Introduce yourself in one sentence.')
+      applyResponse(res, 'Hello! Introduce yourself in one sentence.')
     } catch {
       setMessages([{ role: 'eve', text: "Hi! I'm EVE. How can I help you today?" }])
       setEmotion(EMOTIONS.HAPPY)
     }
   }
 
-  function applyResponse(res) {
+  function applyResponse(res, userText) {
     const nextEmotion = EMOTIONS[res.emotion] ?? detectEmotionFromText(res.message)
     setEmotion((prev) => transition(prev, nextEmotion))
     setMessages((prev) => [...prev, { role: 'eve', text: res.message }])
+    // Append both turns to history for context
+    historyRef.current = [
+      ...historyRef.current,
+      { role: 'user',  parts: [{ text: userText }] },
+      { role: 'model', parts: [{ text: res.message }] },
+    ]
   }
 
   function handleInit() {
@@ -61,18 +68,15 @@ export default function App() {
     setEmotion((prev) => transition(prev, EMOTIONS.THINKING))
 
     try {
-      const res = await sendMessage(text)
-      applyResponse(res)
+      const res = await sendMessage(historyRef.current, text)
+      applyResponse(res, text)
     } catch (err) {
-      setMessages((prev) => [...prev, { role: 'eve', text: 'Something went wrong...' }])
+      setMessages((prev) => [...prev, { role: 'eve', text: `Error: ${err.message}` }])
       setEmotion(EMOTIONS.SAD)
     } finally {
       setThinking(false)
     }
   }
-
-  const animation = character.animations[emotion]
-  const badgeColor = EMOTION_COLORS[emotion]
 
   return (
     <div className="app">
@@ -80,9 +84,12 @@ export default function App() {
         <SpineViewer
           skelUrl={character.skelUrl}
           atlasUrl={character.atlasUrl}
-          animation={animation}
+          animation={character.animations[emotion]}
         />
-        <div className="emotion-badge" style={{ borderColor: badgeColor, color: badgeColor }}>
+        <div
+          className="emotion-badge"
+          style={{ borderColor: EMOTION_COLORS[emotion], color: EMOTION_COLORS[emotion] }}
+        >
           {emotion}
         </div>
       </div>
@@ -91,9 +98,7 @@ export default function App() {
         {!ready ? (
           <div className="api-key-prompt">
             <p>Enter your Gemini API key to start</p>
-            <small>
-              Free key at <strong>aistudio.google.com/apikey</strong>
-            </small>
+            <small>Free key at <strong>aistudio.google.com/apikey</strong></small>
             <input
               type="password"
               value={apiKey}
@@ -101,9 +106,7 @@ export default function App() {
               onKeyDown={(e) => e.key === 'Enter' && handleInit()}
               placeholder="AIza..."
             />
-            <button onClick={handleInit} disabled={!apiKey.trim()}>
-              Start EVE
-            </button>
+            <button onClick={handleInit} disabled={!apiKey.trim()}>Start EVE</button>
           </div>
         ) : (
           <>
