@@ -28,8 +28,9 @@ export default function App() {
   const historyRef                = useRef([])
 
   useEffect(() => {
-    if (ENV_KEY) {
-      initGemini(ENV_KEY)
+    const saved = ENV_KEY || localStorage.getItem('eve_api_key')
+    if (saved) {
+      initGemini(saved)
       setReady(true)
       greet()
     }
@@ -63,6 +64,7 @@ export default function App() {
   function handleInit() {
     const key = apiKey.trim()
     if (!key) return
+    localStorage.setItem('eve_api_key', key)
     initGemini(key)
     setReady(true)
     greet()
