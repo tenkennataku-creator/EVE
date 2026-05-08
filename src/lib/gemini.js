@@ -15,9 +15,9 @@ Emotion guide:
 
 Keep responses concise (1-3 sentences). Be genuine.`
 
-// gemma-4-e2b-it = Edge 2B — smallest/fastest Gemma 4, free via Google AI Studio
-// swap to gemma-4-e4b-it or gemma-4-31b-it for more capable responses
-const MODEL = 'gemma-4-e2b-it'
+// gemma-4-31b-it = Gemma 4 dense 31B, free via Google AI Studio
+// alternative: gemma-4-26b-a4b-it (MoE, 4B active params — faster)
+const MODEL = 'gemma-4-31b-it'
 
 let chat = null
 

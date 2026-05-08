@@ -6,7 +6,6 @@ export default function SpineViewer({ skelUrl, atlasUrl, animation = 'idle' }) {
   const [ready, setReady] = useState(false)
   const [error, setError] = useState(null)
 
-  // Initialize player whenever asset URLs change
   useEffect(() => {
     if (!containerRef.current || !window.spine) return
 
@@ -18,37 +17,45 @@ export default function SpineViewer({ skelUrl, atlasUrl, animation = 'idle' }) {
     }
     containerRef.current.innerHTML = ''
 
-    const player = new window.spine.SpinePlayer(containerRef.current, {
-      skelUrl,
-      atlasUrl,
-      animation,
-      backgroundColor: '#00000000',
-      alpha: true,
-      premultipliedAlpha: true,
-      showControls: false,
-      success: () => {
-        playerRef.current = player
-        setReady(true)
-      },
-      error: (err) => {
-        setError(String(err))
-      },
+    // Defer init one frame so the container has its final CSS dimensions
+    const raf = requestAnimationFrame(() => {
+      if (!containerRef.current) return
+
+      const player = new window.spine.SpinePlayer(containerRef.current, {
+        skelUrl,
+        atlasUrl,
+        animation,
+        showControls: false,
+        premultipliedAlpha: true,
+        // Pad around the character so it's fully visible
+        viewport: {
+          padLeft: '10%',
+          padRight: '10%',
+          padTop: '10%',
+          padBottom: '10%',
+        },
+        success: () => {
+          playerRef.current = player
+          setReady(true)
+        },
+        error: (err) => setError(String(err)),
+      })
     })
 
     return () => {
-      player.dispose?.()
+      cancelAnimationFrame(raf)
+      playerRef.current?.dispose?.()
       playerRef.current = null
       setReady(false)
     }
   }, [skelUrl, atlasUrl])
 
-  // Switch animation when emotion changes
   useEffect(() => {
     if (!ready || !playerRef.current || !animation) return
     try {
       playerRef.current.animationState?.setAnimation(0, animation, true)
     } catch {
-      // Animation name doesn't exist in this skeleton — silently ignore
+      // Animation name not in this skeleton — ignore
     }
   }, [animation, ready])
 
@@ -57,7 +64,7 @@ export default function SpineViewer({ skelUrl, atlasUrl, animation = 'idle' }) {
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
       {error && (
         <div className="spine-error">
-          Failed to load character assets.<br />
+          Failed to load character.<br />
           <small>{error}</small>
         </div>
       )}
