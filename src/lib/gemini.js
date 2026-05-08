@@ -60,21 +60,20 @@ export async function sendMessage(history, userMessage) {
 }
 
 function parseJsonResponse(text) {
-  const start = text.indexOf('{')
-  const end = text.lastIndexOf('}')
-  if (start !== -1 && end !== -1 && end > start) {
+  // Gemma outputs thinking first, JSON last — scan right-to-left for a valid block
+  let end = text.lastIndexOf('}')
+  while (end !== -1) {
+    const start = text.lastIndexOf('{', end)
+    if (start === -1) break
     try {
-      return JSON.parse(text.slice(start, end + 1))
-    } catch {
-      // fall through
-    }
+      const obj = JSON.parse(text.slice(start, end + 1))
+      if (obj.message && obj.emotion) return obj
+    } catch { /* keep scanning */ }
+    end = text.lastIndexOf('}', end - 1)
   }
-  const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
-  try {
-    return JSON.parse(cleaned)
-  } catch {
-    return { message: text, emotion: 'IDLE' }
-  }
+  // Absolute fallback — strip bullet lines, return plain text
+  const cleaned = text.replace(/^\*[^\n]+$/gm, '').trim()
+  return { message: cleaned || text, emotion: 'IDLE' }
 }
 
 export function isInitialized() {

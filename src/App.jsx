@@ -4,6 +4,7 @@ import ChatBox from './components/ChatBox'
 import ChatInput from './components/ChatInput'
 import { initGemini, sendMessage, setModel, getModel, MODELS } from './lib/gemini'
 import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
+import { speak, setTTSEnabled, isTTSEnabled } from './lib/tts'
 import { character } from './config/character'
 
 const ENV_KEY = import.meta.env.VITE_GEMINI_API_KEY
@@ -23,6 +24,7 @@ export default function App() {
   const [ready, setReady]         = useState(false)
   const [apiKey, setApiKey]       = useState('')
   const [activeModel, setActiveModel] = useState(getModel())
+  const [tts, setTts]             = useState(false)
   const historyRef                = useRef([])
 
   useEffect(() => {
@@ -50,6 +52,7 @@ export default function App() {
     const nextEmotion = EMOTIONS[res.emotion] ?? detectEmotionFromText(res.message)
     setEmotion((prev) => transition(prev, nextEmotion))
     setMessages((prev) => [...prev, { role: 'eve', text: res.message }])
+    speak(res.message)
     historyRef.current = [
       ...historyRef.current,
       { role: 'user',  parts: [{ text: userText }] },
@@ -63,6 +66,12 @@ export default function App() {
     initGemini(key)
     setReady(true)
     greet()
+  }
+
+  function handleTTSToggle() {
+    const next = !tts
+    setTts(next)
+    setTTSEnabled(next)
   }
 
   function handleModelCycle() {
@@ -129,6 +138,11 @@ export default function App() {
           </div>
         ) : (
           <>
+            <div className="chat-toolbar">
+              <button className={`tts-btn ${tts ? 'active' : ''}`} onClick={handleTTSToggle}>
+                {tts ? '🔊' : '🔇'} {tts ? 'Voice on' : 'Voice off'}
+              </button>
+            </div>
             <ChatBox messages={messages} thinking={thinking} />
             <ChatInput onSend={handleSend} disabled={thinking} />
           </>

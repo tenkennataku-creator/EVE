@@ -99,6 +99,27 @@ body {
 
 /* ── Chat area ───────────────────────────────────────────────────────────── */
 
+.chat-toolbar {
+  display: flex;
+  padding: 4px 10px;
+  border-bottom: 1px solid #1a1a30;
+}
+
+.tts-btn {
+  background: none;
+  border: 1px solid #2a2a50;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: #505080;
+  cursor: pointer;
+}
+
+.tts-btn.active {
+  border-color: #4060b0;
+  color: #8090d0;
+}
+
 .chat-area {
   height: 240px;
   background: #0a0a18;
