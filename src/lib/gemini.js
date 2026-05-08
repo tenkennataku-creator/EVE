@@ -1,6 +1,8 @@
 // Direct REST calls — no SDK dependency, keeps the bundle tiny
-export const MODEL = 'gemma-4-31b-it'
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`
+export const MODELS = [
+  'gemma-4-31b-it',
+  'gemma-4-26b-a4b-it',
+]
 
 const SYSTEM_PROMPT = `You are EVE. Reply ONLY with a JSON object. No reasoning, no explanation, no bullet points. Just JSON.
 
@@ -16,15 +18,26 @@ Emotion values: IDLE, HAPPY, SAD, EXCITED, THINKING
 One to three sentences max. Output the JSON object and nothing else.`
 
 let apiKey = null
+let activeModel = MODELS[0]
 
 export function initGemini(key) {
   apiKey = key
 }
 
+export function setModel(model) {
+  activeModel = model
+}
+
+export function getModel() {
+  return activeModel
+}
+
 export async function sendMessage(history, userMessage) {
   if (!apiKey) throw new Error('Not initialized')
 
-  const res = await fetch(`${API_URL}?key=${apiKey}`, {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey}`
+
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -47,8 +60,6 @@ export async function sendMessage(history, userMessage) {
 }
 
 function parseJsonResponse(text) {
-  // Gemma 4 sometimes outputs a thinking/reasoning block before the JSON.
-  // Find the first { and last } and extract only that.
   const start = text.indexOf('{')
   const end = text.lastIndexOf('}')
   if (start !== -1 && end !== -1 && end > start) {
@@ -58,7 +69,6 @@ function parseJsonResponse(text) {
       // fall through
     }
   }
-  // Fallback: strip code fences and try again
   const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
   try {
     return JSON.parse(cleaned)

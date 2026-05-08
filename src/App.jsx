@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import SpineViewer from './components/SpineViewer'
 import ChatBox from './components/ChatBox'
 import ChatInput from './components/ChatInput'
-import { initGemini, sendMessage, MODEL } from './lib/gemini'
+import { initGemini, sendMessage, setModel, getModel, MODELS } from './lib/gemini'
 import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
 import { character } from './config/character'
 
@@ -17,12 +17,13 @@ const EMOTION_COLORS = {
 }
 
 export default function App() {
-  const [emotion, setEmotion]   = useState(EMOTIONS.IDLE)
-  const [messages, setMessages] = useState([])
-  const [thinking, setThinking] = useState(false)
-  const [ready, setReady]       = useState(false)
-  const [apiKey, setApiKey]     = useState('')
-  const historyRef              = useRef([])
+  const [emotion, setEmotion]     = useState(EMOTIONS.IDLE)
+  const [messages, setMessages]   = useState([])
+  const [thinking, setThinking]   = useState(false)
+  const [ready, setReady]         = useState(false)
+  const [apiKey, setApiKey]       = useState('')
+  const [activeModel, setActiveModel] = useState(getModel())
+  const historyRef                = useRef([])
 
   useEffect(() => {
     if (ENV_KEY) {
@@ -33,6 +34,9 @@ export default function App() {
   }, [])
 
   async function greet() {
+    historyRef.current = []
+    setMessages([])
+    setEmotion(EMOTIONS.IDLE)
     try {
       const res = await sendMessage([], 'Hello! Introduce yourself in one sentence.')
       applyResponse(res, 'Hello! Introduce yourself in one sentence.')
@@ -46,7 +50,6 @@ export default function App() {
     const nextEmotion = EMOTIONS[res.emotion] ?? detectEmotionFromText(res.message)
     setEmotion((prev) => transition(prev, nextEmotion))
     setMessages((prev) => [...prev, { role: 'eve', text: res.message }])
-    // Append both turns to history for context
     historyRef.current = [
       ...historyRef.current,
       { role: 'user',  parts: [{ text: userText }] },
@@ -59,6 +62,14 @@ export default function App() {
     if (!key) return
     initGemini(key)
     setReady(true)
+    greet()
+  }
+
+  function handleModelCycle() {
+    if (thinking) return
+    const next = MODELS[(MODELS.indexOf(activeModel) + 1) % MODELS.length]
+    setModel(next)
+    setActiveModel(next)
     greet()
   }
 
@@ -92,7 +103,14 @@ export default function App() {
         >
           {emotion}
         </div>
-        <div className="model-badge">{MODEL}</div>
+        <button
+          className="model-badge"
+          onClick={handleModelCycle}
+          disabled={thinking || !ready}
+          title="Tap to switch model"
+        >
+          {activeModel} ⟳
+        </button>
       </div>
 
       <div className="chat-area">

@@ -63,11 +63,24 @@ body {
   bottom: 12px;
   right: 12px;
   background: rgba(0, 0, 0, 0.45);
+  border: 1px solid #303060;
   border-radius: 20px;
   padding: 3px 10px;
   font-size: 10px;
   color: #505080;
+  cursor: pointer;
   letter-spacing: 0.5px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.model-badge:hover:not(:disabled) {
+  color: #8080c0;
+  border-color: #505090;
+}
+
+.model-badge:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .emotion-badge {
