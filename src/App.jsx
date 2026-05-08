@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import SpineViewer from './components/SpineViewer'
 import ChatBox from './components/ChatBox'
 import ChatInput from './components/ChatInput'
-import { initGemini, sendMessage } from './lib/gemini'
+import { initGemini, sendMessage, MODEL } from './lib/gemini'
 import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
 import { character } from './config/character'
 
@@ -92,6 +92,7 @@ export default function App() {
         >
           {emotion}
         </div>
+        <div className="model-badge">{MODEL}</div>
       </div>
 
       <div className="chat-area">

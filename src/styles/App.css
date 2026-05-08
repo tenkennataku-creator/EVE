@@ -58,6 +58,18 @@ body {
 
 /* ── Emotion badge ───────────────────────────────────────────────────────── */
 
+.model-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 10px;
+  color: #505080;
+  letter-spacing: 0.5px;
+}
+
 .emotion-badge {
   position: absolute;
   top: 12px;

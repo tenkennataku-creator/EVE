@@ -1,5 +1,5 @@
 // Direct REST calls — no SDK dependency, keeps the bundle tiny
-const MODEL = 'gemma-4-31b-it'
+export const MODEL = 'gemma-4-31b-it'
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`
 
 const SYSTEM_PROMPT = `You are EVE. Reply ONLY with a JSON object. No reasoning, no explanation, no bullet points. Just JSON.
