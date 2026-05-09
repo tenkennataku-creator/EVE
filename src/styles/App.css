@@ -58,6 +58,26 @@ body {
 
 /* ── Emotion badge ───────────────────────────────────────────────────────── */
 
+.outfit-badge {
+  position: absolute;
+  bottom: 76px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid #302850;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 10px;
+  color: #706090;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.outfit-badge:hover {
+  color: #a080d0;
+  border-color: #504070;
+}
+
 .char-select {
   position: absolute;
   bottom: 44px;

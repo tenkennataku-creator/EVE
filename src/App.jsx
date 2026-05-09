@@ -5,7 +5,7 @@ const VRMViewer = lazy(() => import('./components/VRMViewer'))
 import ChatInput from './components/ChatInput'
 import { initGemini, sendMessage, setModel, getModel, MODELS } from './lib/gemini'
 import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
-import { speak, setTTSEnabled, isTTSEnabled } from './lib/tts'
+import { speak, setTTSEnabled } from './lib/tts'
 import { character as defaultCharacter, CHARACTERS } from './config/character'
 
 const ENV_KEY = import.meta.env.VITE_GEMINI_API_KEY
@@ -30,6 +30,7 @@ export default function App() {
     const saved = localStorage.getItem('eve_active_char')
     return (saved && CHARACTERS.find(c => c.name === saved)) || defaultCharacter
   })
+  const [outfitIdx, setOutfitIdx]     = useState(0)
   const historyRef                    = useRef([])
 
   useEffect(() => {
@@ -100,9 +101,9 @@ export default function App() {
     const next = CHARACTERS.find(c => c.name === e.target.value)
     if (!next) return
     localStorage.setItem('eve_active_char', next.name)
+    setOutfitIdx(0)
     const currentVersion = localStorage.getItem('eve_spine_version') || '4.0'
     if (next.spineVersion !== currentVersion) {
-      // Different spine runtime needed — reload to swap the player script
       localStorage.setItem('eve_spine_version', next.spineVersion)
       window.location.reload()
     } else {
@@ -110,11 +111,16 @@ export default function App() {
     }
   }
 
+  function handleOutfitCycle() {
+    const outfits = activeChar.outfits
+    if (!outfits?.length) return
+    setOutfitIdx(i => (i + 1) % outfits.length)
+  }
+
   async function handleSend(text) {
     setMessages((prev) => [...prev, { role: 'user', text }])
     setThinking(true)
     setEmotion((prev) => transition(prev, EMOTIONS.THINKING))
-
     try {
       const res = await sendMessage(historyRef.current, text)
       applyResponse(res, text)
@@ -126,14 +132,18 @@ export default function App() {
     }
   }
 
+  const outfits   = activeChar.outfits
+  const modelUrl  = outfits ? outfits[outfitIdx].modelUrl : activeChar.modelUrl
+  const outfitKey = outfits ? `${activeChar.name}-${outfitIdx}` : activeChar.name
+
   return (
     <div className="app">
       <div className="viewer-area">
         {activeChar.type === 'vrm' ? (
           <Suspense fallback={null}>
             <VRMViewer
-              key={activeChar.name}
-              modelUrl={activeChar.modelUrl}
+              key={outfitKey}
+              modelUrl={modelUrl}
               emotion={emotion}
             />
           </Suspense>
@@ -151,6 +161,15 @@ export default function App() {
         >
           {emotion}
         </div>
+        {outfits?.length > 1 && (
+          <button
+            className="outfit-badge"
+            onClick={handleOutfitCycle}
+            title="Tap to switch outfit"
+          >
+            {outfits[outfitIdx].label} ⟳
+          </button>
+        )}
         <select
           className="char-select"
           value={activeChar.name}
