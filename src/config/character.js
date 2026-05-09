@@ -73,6 +73,24 @@ export const NIKKE_MODERNIA = nikke('c260', 'Modernia', {
   THINKING: 'talk_start',
 })
 
+// c223 — newer character (not yet in nikke-db JSON; rename once confirmed)
+export const NIKKE_C223 = nikke('c223', 'c223', {
+  IDLE:     'idle',
+  HAPPY:    'delight',
+  SAD:      'angry',
+  EXCITED:  'special',
+  THINKING: 'idle',
+})
+
+// c810 — newer collab character (not yet in nikke-db JSON; rename once confirmed)
+export const NIKKE_C810 = nikke('c810', 'c810', {
+  IDLE:     'idle',
+  HAPPY:    'delight',
+  SAD:      'angry',
+  EXCITED:  'action',
+  THINKING: 'idle',
+})
+
 // ── Character list for UI cycling ─────────────────────────────────────────
 export const CHARACTERS = [
   NIKKE_RAPI,
@@ -80,6 +98,8 @@ export const CHARACTERS = [
   NIKKE_SNOW_WHITE,
   NIKKE_SCARLET,
   NIKKE_MODERNIA,
+  NIKKE_C223,
+  NIKKE_C810,
 ]
 
 // ── Active character ───────────────────────────────────────────────────────
