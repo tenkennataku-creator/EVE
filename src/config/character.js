@@ -1,8 +1,23 @@
 // ── Character Configuration ────────────────────────────────────────────────
 // Set `character` at the bottom to switch the active character.
-// NIKKE assets must be placed in /public/assets/{id}/ before enabling them.
-// NIKKE characters need spine-player @3.8 — swap both CDN lines in index.html.
+// NIKKE assets are loaded directly from raw.githubusercontent.com — no
+// self-hosting required, CORS is open on that domain.
+// NIKKE assets use Spine 4.0; index.html CDN is set to @4.0 accordingly.
 
+// Raw GitHub base for all NIKKE spine assets
+const NIKKE_CDN = 'https://raw.githubusercontent.com/nikke-db/nikke-db.github.io/main/l2d'
+
+function nikke(id, name, animations) {
+  return {
+    name,
+    spineVersion: '4.0',
+    skelUrl:  `${NIKKE_CDN}/${id}/${id}_00.skel`,
+    atlasUrl: `${NIKKE_CDN}/${id}/${id}_00.atlas`,
+    animations,
+  }
+}
+
+// ── Demo character (Spine 4.2) ─────────────────────────────────────────────
 export const DEMO_CHARACTER = {
   name: 'Spineboy',
   spineVersion: '4.2',
@@ -17,51 +32,56 @@ export const DEMO_CHARACTER = {
   },
 }
 
-// ── NIKKE Characters ──────────────────────────────────────────────────────
-// Uncomment the character whose files you placed in /public/assets/{id}/
-// Animation names come from the .atlas file — check [animations] section.
+// ── NIKKE characters (Spine 4.0, loaded directly from GitHub) ─────────────
+export const NIKKE_RAPI = nikke('c010', 'Rapi', {
+  IDLE:     'idle',
+  HAPPY:    'delight',
+  SAD:      'angry',
+  EXCITED:  'special',
+  THINKING: 'talk_start',
+})
 
-// export const NIKKE_NEON = {
-//   name: 'Neon',
-//   spineVersion: '3.8',
-//   skelUrl: '/EVE/assets/neon/neon.skel',
-//   atlasUrl: '/EVE/assets/neon/neon.atlas',
-//   animations: {
-//     IDLE:     'idle',
-//     HAPPY:    'victory',
-//     SAD:      'hit',
-//     EXCITED:  'skill',
-//     THINKING: 'idle',
-//   },
-// }
+export const NIKKE_NEON = nikke('c011', 'Neon', {
+  IDLE:     'idle',
+  HAPPY:    'delight',
+  SAD:      'angry',
+  EXCITED:  'action',
+  THINKING: 'talk_start',
+})
 
-// export const NIKKE_RAPI = {
-//   name: 'Rapi',
-//   spineVersion: '3.8',
-//   skelUrl: '/EVE/assets/rapi/rapi.skel',
-//   atlasUrl: '/EVE/assets/rapi/rapi.atlas',
-//   animations: {
-//     IDLE:     'idle',
-//     HAPPY:    'victory',
-//     SAD:      'hit',
-//     EXCITED:  'skill',
-//     THINKING: 'idle',
-//   },
-// }
+export const NIKKE_SNOW_WHITE = nikke('c220', 'Snow White', {
+  IDLE:     'idle',
+  HAPPY:    'delight',
+  SAD:      'pain',
+  EXCITED:  'special',
+  THINKING: 'talk_start',
+})
 
-// export const NIKKE_ANIS = {
-//   name: 'Anis',
-//   spineVersion: '3.8',
-//   skelUrl: '/EVE/assets/anis/anis.skel',
-//   atlasUrl: '/EVE/assets/anis/anis.atlas',
-//   animations: {
-//     IDLE:     'idle',
-//     HAPPY:    'victory',
-//     SAD:      'hit',
-//     EXCITED:  'skill',
-//     THINKING: 'idle',
-//   },
-// }
+export const NIKKE_SCARLET = nikke('c222', 'Scarlet', {
+  IDLE:     'idle',
+  HAPPY:    'delight',
+  SAD:      'pain',
+  EXCITED:  'action',
+  THINKING: 'talk_start',
+})
+
+export const NIKKE_MODERNIA = nikke('c260', 'Modernia', {
+  IDLE:     'idle',
+  HAPPY:    'delight',
+  SAD:      'pain',
+  EXCITED:  'action',
+  THINKING: 'talk_start',
+})
+
+// ── Character list for UI cycling ─────────────────────────────────────────
+export const CHARACTERS = [
+  NIKKE_RAPI,
+  NIKKE_NEON,
+  NIKKE_SNOW_WHITE,
+  NIKKE_SCARLET,
+  NIKKE_MODERNIA,
+]
 
 // ── Active character ───────────────────────────────────────────────────────
-export const character = DEMO_CHARACTER
+// Change this line to switch characters.
+export const character = NIKKE_RAPI

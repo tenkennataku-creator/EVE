@@ -5,7 +5,7 @@ import ChatInput from './components/ChatInput'
 import { initGemini, sendMessage, setModel, getModel, MODELS } from './lib/gemini'
 import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
 import { speak, setTTSEnabled, isTTSEnabled } from './lib/tts'
-import { character } from './config/character'
+import { character as defaultCharacter, CHARACTERS } from './config/character'
 
 const ENV_KEY = import.meta.env.VITE_GEMINI_API_KEY
 
@@ -18,14 +18,15 @@ const EMOTION_COLORS = {
 }
 
 export default function App() {
-  const [emotion, setEmotion]     = useState(EMOTIONS.IDLE)
-  const [messages, setMessages]   = useState([])
-  const [thinking, setThinking]   = useState(false)
-  const [ready, setReady]         = useState(false)
-  const [apiKey, setApiKey]       = useState('')
+  const [emotion, setEmotion]         = useState(EMOTIONS.IDLE)
+  const [messages, setMessages]       = useState([])
+  const [thinking, setThinking]       = useState(false)
+  const [ready, setReady]             = useState(false)
+  const [apiKey, setApiKey]           = useState('')
   const [activeModel, setActiveModel] = useState(getModel())
-  const [tts, setTts]             = useState(false)
-  const historyRef                = useRef([])
+  const [tts, setTts]                 = useState(false)
+  const [activeChar, setActiveChar]   = useState(defaultCharacter)
+  const historyRef                    = useRef([])
 
   useEffect(() => {
     const saved = ENV_KEY || localStorage.getItem('eve_api_key')
@@ -84,6 +85,13 @@ export default function App() {
     greet()
   }
 
+  function handleCharCycle() {
+    if (thinking) return
+    const idx = CHARACTERS.indexOf(activeChar)
+    const next = CHARACTERS[(idx + 1) % CHARACTERS.length]
+    setActiveChar(next)
+  }
+
   async function handleSend(text) {
     setMessages((prev) => [...prev, { role: 'user', text }])
     setThinking(true)
@@ -104,9 +112,9 @@ export default function App() {
     <div className="app">
       <div className="viewer-area">
         <SpineViewer
-          skelUrl={character.skelUrl}
-          atlasUrl={character.atlasUrl}
-          animation={character.animations[emotion]}
+          skelUrl={activeChar.skelUrl}
+          atlasUrl={activeChar.atlasUrl}
+          animation={activeChar.animations[emotion]}
         />
         <div
           className="emotion-badge"
@@ -114,6 +122,14 @@ export default function App() {
         >
           {emotion}
         </div>
+        <button
+          className="char-badge"
+          onClick={handleCharCycle}
+          disabled={thinking || !ready}
+          title="Tap to switch character"
+        >
+          {activeChar.name} ⟳
+        </button>
         <button
           className="model-badge"
           onClick={handleModelCycle}

@@ -26,9 +26,9 @@ its JSON output. `parseJsonResponse()` scans right-to-left for the last valid
 'application/json'` and `thinkingConfig` are both unsupported on Gemma models via
 this API — do not add them.
 
-**Spine player version** — Currently pinned to `@4.2` (spineboy demo). NIKKE game
-assets were exported with Spine **3.8**. Switching characters requires swapping the
-CDN link in `index.html` to `@3.8`.
+**Spine player version** — Currently pinned to `@4.0` for NIKKE compatibility.
+NIKKE game assets (Rapi, Neon, Snow White, etc.) were exported with Spine **4.0**.
+The spineboy demo uses 4.2 — switch the CDN link in `index.html` if reverting to demo.
 
 **PWA cache** — After deploying a breaking change, users may need to clear site data
 in Chrome (Settings → Site information → Delete data) then re-add to home screen.
@@ -82,28 +82,44 @@ Two Gemma 4 models, cycled by tapping the model badge in the UI:
 
 Both are free via Google AI Studio key.
 
-## NIKKE Character Layer (in progress)
+## NIKKE Character Layer
 
-NIKKE spine assets use Spine **3.8** format. To add a character:
+NIKKE spine assets use Spine **4.0** format. Assets are loaded directly from
+`raw.githubusercontent.com/nikke-db/nikke-db.github.io` which has open CORS —
+**no self-hosting required**.
 
-1. Open [nikke-db](https://www.nikke-db.com) in a browser, navigate to the
-   character's live2D/spine viewer, and capture the `.skel`, `.atlas`, and `.png`
-   files from DevTools → Network → filter by `skel`/`atlas`.
-2. Copy files to `/public/assets/{name}/` (e.g. `public/assets/neon/neon.skel`).
-3. Change the spine-player CDN in `index.html` from `@4.2` to `@3.8`.
-4. In `src/config/character.js`, uncomment the NIKKE template and update animation
-   names to match the ones in the `.atlas` file.
-5. Change the last line from `export const character = DEMO_CHARACTER` to
-   `export const character = NIKKE_NEON` (or whichever character).
+Asset URL pattern:
+```
+https://raw.githubusercontent.com/nikke-db/nikke-db.github.io/main/l2d/{id}/{id}_00.skel
+https://raw.githubusercontent.com/nikke-db/nikke-db.github.io/main/l2d/{id}/{id}_00.atlas
+https://raw.githubusercontent.com/nikke-db/nikke-db.github.io/main/l2d/{id}/{id}_00.png
+```
 
-NIKKE animation names vary by character. Common ones:
-- `idle` → IDLE / THINKING
-- `victory` or `win` → HAPPY / EXCITED
-- `hit` or `hurt` → SAD
-- `skill` or `special` → EXCITED
+Character IDs follow the pattern `c` + 3 digits. Known characters:
 
-Direct CDN fetching from `nikke-db.github.io` is blocked by CORS — assets must be
-self-hosted in `/public/`.
+| ID | Name | ID | Name |
+|---|---|---|---|
+| c010 | Rapi | c011 | Neon |
+| c220 | Snow White | c222 | Scarlet |
+| c260 | Modernia | c191 | Alice |
+| c270 | Blanc | c271 | Noir |
+| c170 | Privaty | c200 | Rupee |
+
+To add a new character:
+1. Find their ID from `Characters.json` in the nikke-db repo.
+2. Extract animation names: `curl -s ".../{id}/{id}_00.skel" | strings | grep -E "^[a-z][a-z_]+$"`
+3. Add a new `nikke(id, name, animations)` entry in `src/config/character.js`.
+4. Add them to the `CHARACTERS` array for UI cycling.
+
+Common animation names (vary per character):
+- `idle` → IDLE / THINKING  
+- `delight` → HAPPY
+- `pain` or `angry` → SAD
+- `special` or `action` → EXCITED
+- `talk_start` → THINKING
+
+Note: `nikke-db.github.io` returns 403 from server-side requests; use
+`raw.githubusercontent.com` instead (CORS open, works from browsers).
 
 ## Local Dev
 
