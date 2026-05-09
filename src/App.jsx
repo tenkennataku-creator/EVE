@@ -122,6 +122,7 @@ export default function App() {
     <div className="app">
       <div className="viewer-area">
         <SpineViewer
+          key={activeChar.name}
           skelUrl={activeChar.skelUrl}
           atlasUrl={activeChar.atlasUrl}
           animation={activeChar.animations[emotion]}
