@@ -48,7 +48,6 @@ export async function sendMessage(history, userMessage) {
       ],
       generationConfig: {
         responseMimeType: 'application/json',
-        thinkingConfig: { thinkingBudget: 0 },
       },
     }),
   })
