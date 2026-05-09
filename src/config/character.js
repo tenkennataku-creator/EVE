@@ -32,14 +32,6 @@ export const NIKKE_NEON = nikke('c011', 'Neon', '4.0', {
   THINKING: 'talk_start',
 })
 
-export const NIKKE_SNOW_WHITE = nikke('c220', 'Snow White', '4.0', {
-  IDLE:     'idle',
-  HAPPY:    'delight',
-  SAD:      'pain',
-  EXCITED:  'special',
-  THINKING: 'talk_start',
-})
-
 export const NIKKE_MODERNIA = nikke('c260', 'Modernia', '4.0', {
   IDLE:     'idle',
   HAPPY:    'delight',
@@ -86,7 +78,6 @@ export const VRM_621 = {
 export const CHARACTERS = [
   NIKKE_RAPI,
   NIKKE_NEON,
-  NIKKE_SNOW_WHITE,
   NIKKE_MODERNIA,
   NIKKE_SCARLET,
   NIKKE_C223,

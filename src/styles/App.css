@@ -62,7 +62,7 @@ body {
   position: absolute;
   bottom: 76px;
   right: 12px;
-  z-index: 10;
+  z-index: 1000;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid #302850;
   border-radius: 20px;
@@ -83,7 +83,7 @@ body {
   position: absolute;
   bottom: 44px;
   right: 12px;
-  z-index: 10;
+  z-index: 1000;
   background: rgba(0, 0, 0, 0.65);
   border: 1px solid #304030;
   border-radius: 20px;
@@ -107,7 +107,7 @@ body {
   position: absolute;
   bottom: 12px;
   right: 12px;
-  z-index: 10;
+  z-index: 1000;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid #303060;
   border-radius: 20px;
@@ -133,7 +133,7 @@ body {
   position: absolute;
   top: 12px;
   right: 12px;
-  z-index: 10;
+  z-index: 1000;
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid;
   border-radius: 20px;
