@@ -81,6 +81,13 @@ export default function App() {
     setTTSEnabled(next)
   }
 
+  function handleResetKey() {
+    localStorage.removeItem('eve_api_key')
+    setReady(false)
+    setMessages([])
+    setApiKey('')
+  }
+
   function handleModelCycle() {
     if (thinking) return
     const next = MODELS[(MODELS.indexOf(activeModel) + 1) % MODELS.length]
@@ -183,6 +190,9 @@ export default function App() {
             <div className="chat-toolbar">
               <button className={`tts-btn ${tts ? 'active' : ''}`} onClick={handleTTSToggle}>
                 {tts ? '🔊' : '🔇'} {tts ? 'Voice on' : 'Voice off'}
+              </button>
+              <button className="reset-key-btn" onClick={handleResetKey} title="Change API key">
+                🔑
               </button>
             </div>
             <ChatBox messages={messages} thinking={thinking} />
