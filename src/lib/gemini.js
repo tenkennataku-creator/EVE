@@ -46,9 +46,6 @@ export async function sendMessage(history, userMessage) {
         ...history,
         { role: 'user', parts: [{ text: userMessage }] },
       ],
-      generationConfig: {
-        responseMimeType: 'application/json',
-      },
     }),
   })
 
