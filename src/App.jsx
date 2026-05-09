@@ -8,6 +8,17 @@ import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
 import { speak, setTTSEnabled } from './lib/tts'
 import { character as defaultCharacter, CHARACTERS } from './config/character'
 
+// Detect spine version mismatch before React renders — reload with correct runtime
+;(() => {
+  const name    = localStorage.getItem('eve_active_char')
+  const char    = name && CHARACTERS.find(c => c.name === name)
+  const loaded  = localStorage.getItem('eve_spine_version') || '4.0'
+  if (char?.spineVersion && char.spineVersion !== loaded) {
+    localStorage.setItem('eve_spine_version', char.spineVersion)
+    window.location.reload()
+  }
+})()
+
 const ENV_KEY = import.meta.env.VITE_GEMINI_API_KEY
 
 const EMOTION_COLORS = {
