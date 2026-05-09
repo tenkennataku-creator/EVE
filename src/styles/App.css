@@ -58,27 +58,25 @@ body {
 
 /* ── Emotion badge ───────────────────────────────────────────────────────── */
 
-.char-badge {
+.char-select {
   position: absolute;
   bottom: 44px;
   right: 12px;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.65);
   border: 1px solid #304030;
   border-radius: 20px;
   padding: 3px 10px;
   font-size: 10px;
-  color: #407050;
+  color: #60b080;
   cursor: pointer;
   letter-spacing: 0.5px;
-  transition: color 0.2s, border-color 0.2s;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  max-width: 120px;
 }
 
-.char-badge:hover:not(:disabled) {
-  color: #60b080;
-  border-color: #406050;
-}
-
-.char-badge:disabled {
+.char-select:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }

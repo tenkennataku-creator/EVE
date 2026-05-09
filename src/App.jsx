@@ -7,6 +7,7 @@ import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
 import { speak, setTTSEnabled, isTTSEnabled } from './lib/tts'
 import { character as defaultCharacter, CHARACTERS } from './config/character'
 
+
 const ENV_KEY = import.meta.env.VITE_GEMINI_API_KEY
 
 const EMOTION_COLORS = {
@@ -85,11 +86,9 @@ export default function App() {
     greet()
   }
 
-  function handleCharCycle() {
-    if (thinking) return
-    const idx = CHARACTERS.indexOf(activeChar)
-    const next = CHARACTERS[(idx + 1) % CHARACTERS.length]
-    setActiveChar(next)
+  function handleCharSelect(e) {
+    const next = CHARACTERS.find(c => c.name === e.target.value)
+    if (next) setActiveChar(next)
   }
 
   async function handleSend(text) {
@@ -122,14 +121,16 @@ export default function App() {
         >
           {emotion}
         </div>
-        <button
-          className="char-badge"
-          onClick={handleCharCycle}
-          disabled={thinking || !ready}
-          title="Tap to switch character"
+        <select
+          className="char-select"
+          value={activeChar.name}
+          onChange={handleCharSelect}
+          disabled={thinking}
         >
-          {activeChar.name} ⟳
-        </button>
+          {CHARACTERS.map(c => (
+            <option key={c.name} value={c.name}>{c.name}</option>
+          ))}
+        </select>
         <button
           className="model-badge"
           onClick={handleModelCycle}
