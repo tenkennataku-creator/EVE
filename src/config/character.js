@@ -77,7 +77,7 @@ export const NIKKE_C810 = nikke('c810', 'c810', '4.1', {
 export const VRM_621 = {
   name: '幻覚',
   type: 'vrm',
-  modelUrl: '/EVE/models/621_幻覚_.vrm',
+  modelUrl: '/EVE/models/621_%E5%B9%BB%E8%A6%9A_.vrm',
 }
 
 export const CHARACTERS = [
