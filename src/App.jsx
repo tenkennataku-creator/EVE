@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import SpineViewer from './components/SpineViewer'
 import ChatBox from './components/ChatBox'
+const VRMViewer = lazy(() => import('./components/VRMViewer'))
 import ChatInput from './components/ChatInput'
 import { initGemini, sendMessage, setModel, getModel, MODELS } from './lib/gemini'
 import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
@@ -121,12 +122,22 @@ export default function App() {
   return (
     <div className="app">
       <div className="viewer-area">
-        <SpineViewer
-          key={activeChar.name}
-          skelUrl={activeChar.skelUrl}
-          atlasUrl={activeChar.atlasUrl}
-          animation={activeChar.animations[emotion]}
-        />
+        {activeChar.type === 'vrm' ? (
+          <Suspense fallback={null}>
+            <VRMViewer
+              key={activeChar.name}
+              modelUrl={activeChar.modelUrl}
+              emotion={emotion}
+            />
+          </Suspense>
+        ) : (
+          <SpineViewer
+            key={activeChar.name}
+            skelUrl={activeChar.skelUrl}
+            atlasUrl={activeChar.atlasUrl}
+            animation={activeChar.animations[emotion]}
+          />
+        )}
         <div
           className="emotion-badge"
           style={{ borderColor: EMOTION_COLORS[emotion], color: EMOTION_COLORS[emotion] }}

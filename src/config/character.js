@@ -74,6 +74,12 @@ export const NIKKE_C810 = nikke('c810', 'c810', '4.1', {
 })
 
 // ── Character list for dropdown ────────────────────────────────────────────
+export const VRM_621 = {
+  name: '幻覚',
+  type: 'vrm',
+  modelUrl: '/EVE/models/621_幻覚_.vrm',
+}
+
 export const CHARACTERS = [
   NIKKE_RAPI,
   NIKKE_NEON,
@@ -82,6 +88,7 @@ export const CHARACTERS = [
   NIKKE_SCARLET,
   NIKKE_C223,
   NIKKE_C810,
+  VRM_621,
 ]
 
 // ── Active character ───────────────────────────────────────────────────────
