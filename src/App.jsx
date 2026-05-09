@@ -7,7 +7,6 @@ import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
 import { speak, setTTSEnabled, isTTSEnabled } from './lib/tts'
 import { character as defaultCharacter, CHARACTERS } from './config/character'
 
-
 const ENV_KEY = import.meta.env.VITE_GEMINI_API_KEY
 
 const EMOTION_COLORS = {
@@ -26,7 +25,10 @@ export default function App() {
   const [apiKey, setApiKey]           = useState('')
   const [activeModel, setActiveModel] = useState(getModel())
   const [tts, setTts]                 = useState(false)
-  const [activeChar, setActiveChar]   = useState(defaultCharacter)
+  const [activeChar, setActiveChar]   = useState(() => {
+    const saved = localStorage.getItem('eve_active_char')
+    return (saved && CHARACTERS.find(c => c.name === saved)) || defaultCharacter
+  })
   const historyRef                    = useRef([])
 
   useEffect(() => {
@@ -88,7 +90,16 @@ export default function App() {
 
   function handleCharSelect(e) {
     const next = CHARACTERS.find(c => c.name === e.target.value)
-    if (next) setActiveChar(next)
+    if (!next) return
+    localStorage.setItem('eve_active_char', next.name)
+    const currentVersion = localStorage.getItem('eve_spine_version') || '4.0'
+    if (next.spineVersion !== currentVersion) {
+      // Different spine runtime needed — reload to swap the player script
+      localStorage.setItem('eve_spine_version', next.spineVersion)
+      window.location.reload()
+    } else {
+      setActiveChar(next)
+    }
   }
 
   async function handleSend(text) {
