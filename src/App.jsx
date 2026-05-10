@@ -8,13 +8,17 @@ import { transition, detectEmotionFromText, EMOTIONS } from './lib/emotionFSM'
 import { speak, setTTSEnabled } from './lib/tts'
 import { character as defaultCharacter, CHARACTERS } from './config/character'
 
-// Detect spine version mismatch before React renders — reload with correct runtime
+// Detect spine version mismatch before React renders — reload with correct runtime.
+// Checks the saved outfit's version, not just the character's base version.
 ;(() => {
-  const name    = localStorage.getItem('eve_active_char')
-  const char    = name && CHARACTERS.find(c => c.name === name)
-  const loaded  = localStorage.getItem('eve_spine_version') || '4.0'
-  if (char?.spineVersion && char.spineVersion !== loaded) {
-    localStorage.setItem('eve_spine_version', char.spineVersion)
+  const name          = localStorage.getItem('eve_active_char')
+  const char          = name && CHARACTERS.find(c => c.name === name)
+  const loaded        = localStorage.getItem('eve_spine_version') || '4.0'
+  const savedOutfit   = parseInt(localStorage.getItem('eve_outfit_idx') || '0')
+  const outfitVersion = char?.outfits?.[savedOutfit]?.spineVersion
+  const target        = outfitVersion ?? char?.spineVersion
+  if (target && target !== loaded) {
+    localStorage.setItem('eve_spine_version', target)
     window.location.reload()
   }
 })()
@@ -41,7 +45,13 @@ export default function App() {
     const saved = localStorage.getItem('eve_active_char')
     return (saved && CHARACTERS.find(c => c.name === saved)) || defaultCharacter
   })
-  const [outfitIdx, setOutfitIdx]     = useState(0)
+  const [outfitIdx, setOutfitIdx]     = useState(() => {
+    const saved   = parseInt(localStorage.getItem('eve_outfit_idx') || '0')
+    const charName = localStorage.getItem('eve_active_char')
+    const char    = (charName && CHARACTERS.find(c => c.name === charName)) || defaultCharacter
+    const max     = (char.outfits?.length ?? 1) - 1
+    return Math.min(Math.max(0, saved), max)
+  })
   const historyRef                    = useRef([])
 
   useEffect(() => {
@@ -112,10 +122,12 @@ export default function App() {
     const next = CHARACTERS.find(c => c.name === e.target.value)
     if (!next) return
     localStorage.setItem('eve_active_char', next.name)
+    localStorage.removeItem('eve_outfit_idx')
     setOutfitIdx(0)
     const currentVersion = localStorage.getItem('eve_spine_version') || '4.0'
-    if (next.spineVersion !== currentVersion) {
-      localStorage.setItem('eve_spine_version', next.spineVersion)
+    const targetVersion  = next.outfits?.[0]?.spineVersion ?? next.spineVersion
+    if (targetVersion !== currentVersion) {
+      localStorage.setItem('eve_spine_version', targetVersion)
       window.location.reload()
     } else {
       setActiveChar(next)
@@ -125,7 +137,16 @@ export default function App() {
   function handleOutfitCycle() {
     const outfits = activeChar.outfits
     if (!outfits?.length) return
-    setOutfitIdx(i => (i + 1) % outfits.length)
+    const nextIdx    = (outfitIdx + 1) % outfits.length
+    const nextOutfit = outfits[nextIdx]
+    localStorage.setItem('eve_outfit_idx', nextIdx)
+    const currentVersion = localStorage.getItem('eve_spine_version') || '4.0'
+    if (nextOutfit.spineVersion && nextOutfit.spineVersion !== currentVersion) {
+      localStorage.setItem('eve_spine_version', nextOutfit.spineVersion)
+      window.location.reload()
+    } else {
+      setOutfitIdx(nextIdx)
+    }
   }
 
   async function handleSend(text) {
@@ -143,9 +164,13 @@ export default function App() {
     }
   }
 
-  const outfits   = activeChar.outfits
-  const modelUrl  = outfits ? outfits[outfitIdx].modelUrl : activeChar.modelUrl
-  const outfitKey = outfits ? `${activeChar.name}-${outfitIdx}` : activeChar.name
+  const outfits      = activeChar.outfits
+  const activeOutfit = outfits?.[outfitIdx]
+  const skelUrl      = activeOutfit?.skelUrl   ?? activeChar.skelUrl
+  const atlasUrl     = activeOutfit?.atlasUrl  ?? activeChar.atlasUrl
+  const animations   = activeOutfit?.animations ?? activeChar.animations
+  const modelUrl     = activeOutfit?.modelUrl
+  const outfitKey    = outfits ? `${activeChar.name}-${outfitIdx}` : activeChar.name
 
   return (
     <div className="app">
@@ -160,10 +185,10 @@ export default function App() {
           </Suspense>
         ) : (
           <SpineViewer
-            key={activeChar.name}
-            skelUrl={activeChar.skelUrl}
-            atlasUrl={activeChar.atlasUrl}
-            animation={activeChar.animations[emotion]}
+            key={outfitKey}
+            skelUrl={skelUrl}
+            atlasUrl={atlasUrl}
+            animation={animations[emotion]}
           />
         )}
         <div

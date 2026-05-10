@@ -1,7 +1,6 @@
 // ── Character Configuration ────────────────────────────────────────────────
-// Set `character` at the bottom to switch the active character.
 // Assets loaded directly from raw.githubusercontent.com (CORS open, no hosting needed).
-// Spine version is per-character — the app reloads with the right runtime when switching.
+// Spine version is per-outfit — the app reloads with the correct runtime when needed.
 
 const NIKKE_CDN = 'https://raw.githubusercontent.com/nikke-db/nikke-db.github.io/main/l2d'
 
@@ -15,15 +14,49 @@ function nikke(id, name, spineVersion, animations) {
   }
 }
 
-// ── NIKKE characters — Spine 4.0.47 ──────────────────────────────────────
-export const NIKKE_RAPI = nikke('c010', 'Rapi', '4.0', {
+function outfit(label, id, spineVersion, animOverrides) {
+  const entry = {
+    label,
+    spineVersion,
+    skelUrl:  `${NIKKE_CDN}/${id}/${id}_00.skel`,
+    atlasUrl: `${NIKKE_CDN}/${id}/${id}_00.atlas`,
+  }
+  if (animOverrides) entry.animations = animOverrides
+  return entry
+}
+
+// Shared animation map — used by most Rapi outfits
+const RAPI_ANIMS = {
   IDLE:     'idle',
   HAPPY:    'delight',
   SAD:      'angry',
   EXCITED:  'special',
   THINKING: 'talk_start',
-})
+}
 
+// ── Rapi — multiple outfits spanning Spine 4.0 and 4.1 ────────────────────
+export const NIKKE_RAPI = {
+  name: 'Rapi',
+  spineVersion: '4.0',
+  animations: RAPI_ANIMS,
+  outfits: [
+    outfit('Default',          'c010',      '4.0'),
+    outfit('c010-01',          'c010_01',   '4.0'),
+    outfit('White Promise',    'c010_02',   '4.0'),
+    outfit('Classic Vacation', 'c010_03',   '4.1'),
+    outfit('Red Hood',         'c016',      '4.1'),
+    outfit('Red Hood (Teal)',  'c016_01',   '4.1'),
+    outfit('Red Hood (Red)',   'c016_02',   '4.1'),
+    outfit('Red Hood (Rose)',  'c016_03',   '4.1'),
+    outfit('c989',             'c989',      '4.1'),
+    outfit('c990',             'c990',      '4.1', { IDLE: 'idle', HAPPY: 'delight', SAD: 'pain',  EXCITED: 'idle', THINKING: 'idle' }),
+    outfit('c992',             'c992',      '4.1', { IDLE: 'idle', HAPPY: 'delight', SAD: 'angry', EXCITED: 'idle', THINKING: 'idle' }),
+    outfit('c994',             'c994',      '4.1', { IDLE: 'idle', HAPPY: 'idle_02', SAD: 'angry', EXCITED: 'surprise_02', THINKING: 'idle_02' }),
+    outfit('Smol',             'smol_rapi', '4.1', { IDLE: 'idle', HAPPY: 'delight', SAD: 'angry_1', EXCITED: 'angry_2', THINKING: 'idle' }),
+  ],
+}
+
+// ── Other NIKKE characters — Spine 4.0.47 ────────────────────────────────
 export const NIKKE_NEON = nikke('c011', 'Neon', '4.0', {
   IDLE:     'idle',
   HAPPY:    'delight',
@@ -65,7 +98,7 @@ export const NIKKE_C810 = nikke('c810', 'c810', '4.1', {
   THINKING: 'idle',
 })
 
-// ── Character list for dropdown ────────────────────────────────────────────
+// ── VRM characters ─────────────────────────────────────────────────────────
 export const VRM_621 = {
   name: '幻覚',
   type: 'vrm',
