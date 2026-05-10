@@ -41,7 +41,6 @@ export const NIKKE_RAPI = {
   animations: RAPI_ANIMS,
   outfits: [
     outfit('Default',          'c010',      '4.0'),
-    outfit('c010-01',          'c010_01',   '4.0'),
     outfit('White Promise',    'c010_02',   '4.0'),
     outfit('Classic Vacation', 'c010_03',   '4.1'),
     outfit('Red Hood',         'c016',      '4.1'),
@@ -49,8 +48,6 @@ export const NIKKE_RAPI = {
     outfit('Red Hood (Red)',   'c016_02',   '4.1'),
     outfit('Red Hood (Rose)',  'c016_03',   '4.1'),
     outfit('c989',             'c989',      '4.1'),
-    outfit('c990',             'c990',      '4.1', { IDLE: 'idle', HAPPY: 'delight', SAD: 'pain',  EXCITED: 'idle', THINKING: 'idle' }),
-    outfit('c992',             'c992',      '4.1', { IDLE: 'idle', HAPPY: 'delight', SAD: 'angry', EXCITED: 'idle', THINKING: 'idle' }),
     outfit('c994',             'c994',      '4.1', { IDLE: 'idle', HAPPY: 'idle_02', SAD: 'angry', EXCITED: 'surprise_02', THINKING: 'idle_02' }),
     outfit('Smol',             'smol_rapi', '4.1', { IDLE: 'idle', HAPPY: 'delight', SAD: 'angry_1', EXCITED: 'angry_2', THINKING: 'idle' }),
   ],

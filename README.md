@@ -1,6 +1,6 @@
 # EVE
 
-An AI chatbot with an animated NIKKE game character as its face. The character reacts emotionally to the conversation — switching animations based on mood in real time.
+An AI chatbot with an animated character as its face. The character reacts emotionally to the conversation — switching animations based on mood in real time.
 
 Live: **https://tenkennataku-creator.github.io/EVE/**
 
@@ -27,19 +27,37 @@ Live: **https://tenkennataku-creator.github.io/EVE/**
 - Tap **Voice off / Voice on** to toggle text-to-speech readout
 
 ### Switching characters
-Tap the **green dropdown** in the bottom-right corner of the character viewer. Available characters:
+Tap the **green dropdown** in the bottom-right corner of the character viewer:
 
-| Name | Spine version |
+| Name | Type | Notes |
+|---|---|---|
+| Rapi | Spine 4.0/4.1 | 10 outfit variants |
+| Neon | Spine 4.0 | |
+| Modernia | Spine 4.0 | |
+| Scarlet | Spine 4.1 | |
+| c223 | Spine 4.1 | |
+| c810 | Spine 4.1 | |
+| 幻覚 | VRM 3D | 2 outfit variants |
+
+Switching between a 4.0 and 4.1 character causes a quick automatic reload to swap the Spine runtime — your selection is restored immediately after.
+
+### Switching outfits
+When a character has multiple outfits, a **purple badge** appears in the bottom-right corner showing the current outfit name. Tap it to cycle through outfits.
+
+Rapi's available outfits:
+
+| Outfit | Notes |
 |---|---|
-| Rapi | 4.0 |
-| Neon | 4.0 |
-| Snow White | 4.0 |
-| Modernia | 4.0 |
-| Scarlet | 4.1 |
-| c223 | 4.1 |
-| c810 | 4.1 |
-
-Switching between a 4.0 and 4.1 character causes a quick automatic reload to swap the spine runtime — your character selection is restored immediately after.
+| Default | Base Rapi (Spine 4.0) |
+| White Promise | Spine 4.0 |
+| Classic Vacation | Spine 4.1 — triggers reload |
+| Red Hood | Spine 4.1 |
+| Red Hood (Teal) | Spine 4.1 |
+| Red Hood (Red) | Spine 4.1 |
+| Red Hood (Rose) | Spine 4.1 |
+| c989 | Spine 4.1 |
+| c994 | Spine 4.1 |
+| Smol | Spine 4.1 |
 
 ### Switching AI models
 Tap the **model badge** in the bottom-right corner to cycle between:
@@ -55,7 +73,8 @@ Both are free via Google AI Studio.
 | Layer | What it does |
 |---|---|
 | **React + Vite** | UI framework, compiled and deployed via GitHub Actions |
-| **Spine Player** | Renders the 2D animated character (EsotericSoftware) |
+| **Spine Player** | Renders the 2D animated characters (EsotericSoftware) |
+| **Three.js + VRM** | Renders 3D VRM avatar characters with procedural idle animation |
 | **NIKKE assets** | Character skeletons loaded from `raw.githubusercontent.com` — open CORS, no hosting needed |
 | **Google Gemma 4** | AI responses via Gemini REST API (free tier) |
 | **Emotion FSM** | 5-state machine (IDLE / HAPPY / SAD / EXCITED / THINKING) maps AI output to animations |
@@ -74,9 +93,9 @@ Both are free via Google AI Studio.
 
 ---
 
-## Adding a new character
+## Adding a new NIKKE character
 
-1. Find the character's ID (format: `c` + 3 digits) from the [nikke-db Characters.json](https://raw.githubusercontent.com/nikke-db/nikke-db.github.io/main/js/json/Characters.json)
+1. Find the character's ID (format: `c` + 3 digits) from the nikke-db repo
 2. Check their Spine version and animation names:
    ```bash
    curl -s "https://raw.githubusercontent.com/nikke-db/nikke-db.github.io/main/l2d/{id}/{id}_00.skel" \
@@ -94,7 +113,19 @@ Both are free via Google AI Studio.
    })
    ```
 5. Add the export to the `CHARACTERS` array at the bottom of the file
-6. Push to the branch — GitHub Actions deploys automatically
+
+## Adding outfits to an existing character
+
+Outfits are an `outfits` array on the character object. Each entry needs `label`, `spineVersion`, `skelUrl`, and `atlasUrl`. Add an optional `animations` object only if the outfit's animation names differ from the character's defaults:
+
+```js
+outfits: [
+  outfit('Default', 'c010', '4.0'),
+  outfit('Alt',     'c010_alt', '4.1', { IDLE: 'idle', HAPPY: 'delight', SAD: 'angry', EXCITED: 'idle', THINKING: 'idle' }),
+]
+```
+
+Switching between outfits with different Spine versions triggers an automatic reload.
 
 ---
 
@@ -109,4 +140,4 @@ Set `VITE_GEMINI_API_KEY=AIza...` in a `.env` file to skip the API key prompt on
 
 ## Deployment
 
-Push to `claude/mobile-environment-exploration-2ATAz` (or `main`) → GitHub Actions builds and deploys to GitHub Pages automatically.
+Push to the branch → GitHub Actions builds and deploys to GitHub Pages automatically.
