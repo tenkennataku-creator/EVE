@@ -124,9 +124,13 @@ export default function App() {
     localStorage.setItem('eve_active_char', next.name)
     localStorage.removeItem('eve_outfit_idx')
     setOutfitIdx(0)
+    if (next.type === 'vrm') {
+      setActiveChar(next)
+      return
+    }
     const currentVersion = localStorage.getItem('eve_spine_version') || '4.0'
     const targetVersion  = next.outfits?.[0]?.spineVersion ?? next.spineVersion
-    if (targetVersion !== currentVersion) {
+    if (targetVersion && targetVersion !== currentVersion) {
       localStorage.setItem('eve_spine_version', targetVersion)
       window.location.reload()
     } else {
