@@ -75,10 +75,10 @@ all others — this prevents jarring animation cuts.
 
 ## Models
 
-Two Gemma 4 models, cycled by tapping the model badge in the UI:
+Two Gemini 2.0 models, cycled by tapping the model badge in the UI:
 
-- `gemma-4-31b-it` — larger, smarter (default)
-- `gemma-4-26b-a4b-it` — mixture-of-experts, different personality
+- `gemini-2.0-flash` — fast, capable (default)
+- `gemini-2.0-flash-lite` — lighter, lower latency
 
 Both are free via Google AI Studio key.
 

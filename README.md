@@ -61,8 +61,8 @@ Rapi's available outfits:
 
 ### Switching AI models
 Tap the **model badge** in the bottom-right corner to cycle between:
-- `gemma-4-31b-it` — larger, more capable (default)
-- `gemma-4-26b-a4b-it` — mixture-of-experts, different personality
+- `gemini-2.0-flash` — fast, capable (default)
+- `gemini-2.0-flash-lite` — lighter, lower latency
 
 Both are free via Google AI Studio.
 

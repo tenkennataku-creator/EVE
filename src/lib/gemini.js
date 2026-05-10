@@ -1,7 +1,7 @@
 // Direct REST calls — no SDK dependency, keeps the bundle tiny
 export const MODELS = [
-  'gemma-4-31b-it',
-  'gemma-4-26b-a4b-it',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
 ]
 
 const SYSTEM_PROMPT = `You are EVE. Reply ONLY with a JSON object. No reasoning, no explanation, no bullet points. Just JSON.
