@@ -80,7 +80,8 @@ Two Gemini 2.0 models, cycled by tapping the model badge in the UI:
 - `gemini-2.0-flash` — fast, capable (default)
 - `gemini-2.0-flash-lite` — lighter, lower latency
 
-Both are free via Google AI Studio key.
+Both are free via Google AI Studio key. Note: gemma-4 models (`gemma-4-31b-it` etc.)
+return HTTP 500 and should not be used.
 
 ## NIKKE Character Layer
 
