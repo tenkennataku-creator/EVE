@@ -1,7 +1,7 @@
 // Direct REST calls — no SDK dependency, keeps the bundle tiny
 export const MODELS = [
-  'gemini-2.0-flash',
-  'gemini-2.0-flash-lite',
+  'gemma-4-31b-it',
+  'gemma-4-26b-a4b-it',
 ]
 
 const SYSTEM_PROMPT = `You are EVE. Reply ONLY with a JSON object. No reasoning, no explanation, no bullet points. Just JSON.
@@ -55,7 +55,9 @@ export async function sendMessage(history, userMessage) {
   }
 
   const data = await res.json()
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+  const parts = data.candidates?.[0]?.content?.parts ?? []
+  const text = parts.filter(p => !p.thought).map(p => p.text).join('')
+    || parts.map(p => p.text).join('')
   return parseJsonResponse(text)
 }
 
