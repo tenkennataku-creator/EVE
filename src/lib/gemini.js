@@ -37,16 +37,18 @@ export async function sendMessage(history, userMessage) {
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey}`
 
+  // system_instruction is unsupported by Gemma models — inject as first turn instead
+  const contents = [
+    { role: 'user',  parts: [{ text: SYSTEM_PROMPT }] },
+    { role: 'model', parts: [{ text: '{"message":"Ready.","emotion":"IDLE"}' }] },
+    ...history,
+    { role: 'user',  parts: [{ text: userMessage }] },
+  ]
+
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents: [
-        ...history,
-        { role: 'user', parts: [{ text: userMessage }] },
-      ],
-    }),
+    body: JSON.stringify({ contents }),
   })
 
   if (!res.ok) {
